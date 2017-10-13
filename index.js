@@ -1,22 +1,30 @@
+// Reference the packages we require so that we can use them in creating the bot
 var restify = require('restify');
 var builder = require('botbuilder');
-
+// =========================================================
+// Bot Setup
+// =========================================================
 // Setup Restify Server
+// Listen for any activity on port 3978 of our local server
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
-   console.log('%s listening to %s', server.name, server.url); 
+ console.log('%s listening to %s', server.name, server.url);
 });
-
-// Create chat connector for communicating with the Bot Framework Service
+// Create chat bot
 var connector = new builder.ChatConnector({
     appId: "b37d7371-7db5-410f-8b47-50dab50f9a30",
     appPassword: "aev950CtMVnufBQ9P499dxJ"
+ //appId: process.env.MICROSOFT_APP_ID,
+ //appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
-
-// Listen for messages from users 
+var bot = new builder.UniversalBot(connector);
+// If a Post request is made to /api/messages on port 3978 of our local server, then we pass it to the bot connector to handle
 server.post('/api/messages', connector.listen());
-
-// Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
-var bot = new builder.UniversalBot(connector, function (session) {
-    session.send("You said: %s", session.message.text);
+// =========================================================
+// Bots Dialogs 
+// =========================================================
+// This is called the root dialog. It is the first point of entry for any message the bot receives
+bot.dialog('/', function (session) {
+// Send 'hello world' to the user
+session.send("Hello World");
 });
